@@ -1,7 +1,19 @@
 #include "server.h"
+#include <csignal>
+
+Server* gServer = nullptr;
+
+void signalHandler(int signal){
+    if(gServer) {
+        gServer->save("data.bin");
+    }
+    exit(0);
+}
 
 int main() {
     Server s(8080);
+    gServer = &s;
+    std::signal(SIGINT, signalHandler);
 
     if(s.load("data.bin")){
         std::cout << "Data loaded successfully\n";
@@ -14,7 +26,7 @@ int main() {
     if(s.save("data.bin")) {
         std::cout << "Data saved successfully\n";
     } else {
-        std::cout << "Failed to save data\n";
+        std::cerr << "Failed to save data\n";
     }
 
     return 0;

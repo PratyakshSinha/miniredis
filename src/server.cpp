@@ -1,4 +1,5 @@
 #include "server.h"
+#include <algorithm>
 #include <sstream>
 
 Server::Server(int portNumber)
@@ -87,6 +88,8 @@ void Server::handleClient(SOCKET clientSocket)
         }
 
         std::string command = tokens[0];
+        std::transform(command.begin(), command.end(), command.begin(), ::toupper);
+
         if(command == "SET") {
             if(tokens.size() == 3) {
                 std::string key = tokens[1];
@@ -145,6 +148,13 @@ void Server::handleClient(SOCKET clientSocket)
         } else if(command == "EXIT") {
             closesocket(clientSocket);
             return;
+        } else if(command == "SHUTDOWN"){
+            m_store.save("data.bin");
+            std::string shutdownMsg = "+OK shutting down\n";
+            send(clientSocket, shutdownMsg.data(), shutdownMsg.size(), 0);
+            closesocket(clientSocket);
+            WSACleanup();
+            exit(0);
         } else {
             response = "-ERR unknown command";
         }

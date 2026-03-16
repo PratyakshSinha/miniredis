@@ -1,5 +1,6 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -28,7 +29,7 @@ void run() {
         char buffer[1024] = {0};
         std::getline(std::cin, command);
 
-        if(command == "EXIT"){
+        if(command == "EXIT" || command == "SHUTDOWN"){
             send(clientSocket, command.data(), command.size(), 0);
             closesocket(clientSocket);
             WSACleanup();
