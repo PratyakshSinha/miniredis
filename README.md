@@ -27,10 +27,10 @@ A lightweight in-memory key-value store built from scratch in C++, inspired by R
 ## Features
 
 - `SET`, `GET`, `DEL`, `EXISTS`, `PING` commands
-- TTL support — keys automatically expire after a set time
+- TTL support  keys automatically expire after a set time
 - Multiple simultaneous clients via multithreading
 - Thread-safe store using `std::mutex`
-- Data persistence — saves to file on shutdown, reloads on startup
+- Data persistence  saves to file on shutdown, reloads on startup
 - Case insensitive commands
 - Graceful shutdown via `SHUTDOWN` command or `Ctrl+C`
 
@@ -41,7 +41,7 @@ A lightweight in-memory key-value store built from scratch in C++, inspired by R
 The project is split into three components:
 
 **Store** (`src/store.h` / `src/store.cpp`)
-The core data layer. Holds all key-value pairs in a `std::unordered_map` in RAM. A second map tracks expiry times using `std::chrono::steady_clock`. A `std::mutex` protects both maps from concurrent access. Expired keys are cleaned up lazily — only when accessed, not on a background thread.
+The core data layer. Holds all key-value pairs in a `std::unordered_map` in RAM. A second map tracks expiry times using `std::chrono::steady_clock`. A `std::mutex` protects both maps from concurrent access. Expired keys are cleaned up lazily  only when accessed, not on a background thread.
 
 **Server** (`src/server.h` / `src/server.cpp`)
 Opens a TCP socket on the configured port and enters an accept loop. Every time a client connects, a new `std::thread` is spawned to handle that client independently. All threads share the same `Store` instance. Each thread reads commands from its socket, parses them, executes against the store, and sends back a response.
@@ -94,7 +94,7 @@ Then connect with the client in a separate terminal:
 .\build\client.exe
 ```
 
-You can open multiple client terminals simultaneously — each gets its own connection.
+You can open multiple client terminals simultaneously  each gets its own connection.
 
 ---
 
@@ -109,11 +109,11 @@ You can open multiple client terminals simultaneously — each gets its own conn
 | `DEL` | `DEL name` | `:1` / `:0` | Delete a key |
 | `EXISTS` | `EXISTS name` | `:1` / `:0` | Check if key exists |
 | `SHUTDOWN` | `SHUTDOWN` | `+OK shutting down` | Save and shut down server |
-| `EXIT` | `EXIT` | — | Disconnect client |
+| `EXIT` | `EXIT` |  | Disconnect client |
 
 Response prefixes follow Redis convention: `+` success, `-` error, `:` integer.
 
-Commands are case insensitive — `ping`, `Ping`, and `PING` all work.
+Commands are case insensitive  `ping`, `Ping`, and `PING` all work.
 
 ---
 
@@ -121,7 +121,7 @@ Commands are case insensitive — `ping`, `Ping`, and `PING` all work.
 
 - Values cannot contain spaces
 - `SHUTDOWN` can be called by any connected client
-- Data is saved on clean shutdown only — if the process is killed forcefully, unsaved data is lost
+- Data is saved on clean shutdown only  if the process is killed forcefully, unsaved data is lost
 
 ---
 
@@ -129,8 +129,8 @@ Commands are case insensitive — `ping`, `Ping`, and `PING` all work.
 
 Building this project gave me hands-on experience with three areas I had little prior exposure to:
 
-**TCP Networking** — I had never written socket code before. Learning how `socket()`, `bind()`, `listen()`, and `accept()` work together — and how the same `send()`/`recv()` functions are used symmetrically on both sides of a connection — gave me a clear mental model of how networked applications actually communicate.
+**TCP Networking**  I had never written socket code before. Learning how `socket()`, `bind()`, `listen()`, and `accept()` work together  and how the same `send()`/`recv()` functions are used symmetrically on both sides of a connection  gave me a clear mental model of how networked applications actually communicate.
 
-**Multithreading and race conditions** — Understanding why a `std::mutex` is necessary when multiple threads access shared data was one of the most valuable things I took away. Without it, two threads calling `store.set()` simultaneously could corrupt the hashmap silently — the kind of bug that's extremely hard to track down.
+**Multithreading and race conditions**  Understanding why a `std::mutex` is necessary when multiple threads access shared data was one of the most valuable things I took away. Without it, two threads calling `store.set()` simultaneously could corrupt the hashmap silently  the kind of bug that's extremely hard to track down.
 
-**How Redis works at a fundamental level** — Before this project I had heard of Redis but never understood it. Building a simplified version from scratch — in-memory storage, TTL via lazy deletion, file-based persistence — made the core ideas concrete rather than abstract.
+**How Redis works at a fundamental level**  Before this project I had heard of Redis but never understood it. Building a simplified version from scratch  in-memory storage, TTL via lazy deletion, file-based persistence  made the core ideas concrete rather than abstract.
